@@ -16,5 +16,15 @@
     "url": "https://github.com/AnshAngural/sign-up-login-/issues"
   },
   "homepage": "https://github.com/AnshAngural/sign-up-login-#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.2.4",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.2.0"
+  }
 }

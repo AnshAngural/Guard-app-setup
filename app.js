@@ -1,46 +1,61 @@
-// app.js
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const express = require("express");
-const path = require("path");
-const morgan = require("morgan"); // logger
-const dotenv = require("dotenv");
+const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
+const expressLayouts = require("express-ejs-layouts");
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
 
-dotenv.config(); // load .env
+
+
 
 const app = express();
+connectDB();
 
-// =====================
-// MIDDLEWARE
-// =====================
-app.use(express.json()); // parse JSON
-app.use(express.urlencoded({ extended: true })); // parse form data
-app.use(morgan("dev")); // request logging
-app.use(express.static(path.join(__dirname, "public"))); // static files
 
-// =====================
-// ROUTES
-// =====================
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(session({
+  secret: "supersecretkey",
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI
+  }),
+  cookie: { maxAge: 1000 * 60 * 60 * 24 }
+}));
+
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(expressLayouts);
+app.set("layout", "layout");
+
+app.use((req, res, next) => {
+res.locals.user = null;
+next();
+});
+
+
+app.use(authRoutes);
+
 app.get("/", (req, res) => {
-  res.send("🚀 API is running...");
+  res.render("index", { title: "Home" });
 });
 
-// Example API route
-app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", uptime: process.uptime() });
+app.get("/login", (req, res) => {
+  res.render("login", { title: "Login" });
 });
 
-// =====================
-// ERROR HANDLING
-// =====================
-app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
+app.get("/signup", (req, res) => {
+  res.render("signup", { title: "Signup" });
 });
 
-// =====================
-// SERVER
-// =====================
-const PORT = process.env.PORT || 5000;
+console.log("ENV CHECK:", process.env.MONGO_URI);
 
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log("Server running on", PORT));
