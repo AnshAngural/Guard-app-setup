@@ -1,8 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-        <a class="navbar-brand" href="/">MyApp</a>
+        <a class="navbar-brand fw-bold" href="/">Guard Portal</a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -14,7 +16,8 @@
                 </li>
 
                 <% if (!user) { %>
-                    <!-- Not logged in -->
+
+                    <!-- Guest -->
                     <li class="nav-item">
                         <a class="nav-link" href="/login">Login</a>
                     </li>
@@ -22,15 +25,30 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/signup">Sign Up</a>
                     </li>
+
                 <% } else { %>
-                    <!-- Logged in -->
+
+                    <!-- Logged In -->
                     <li class="nav-item">
-                        <span class="nav-link text-light">Hi, <%= user.name %></span>
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+
+                    <% if (user.role === "admin") { %>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="/admin">Admin Panel</a>
+                        </li>
+                    <% } %>
+
+                    <li class="nav-item">
+                        <span class="nav-link text-light">
+                            Hi, <%= user.name %>
+                        </span>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link text-warning" href="/logout">Logout</a>
+                        <a class="nav-link text-danger" href="/logout">Logout</a>
                     </li>
+
                 <% } %>
 
             </ul>
