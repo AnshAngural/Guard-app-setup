@@ -1,21 +1,17 @@
 const express = require('express');
-const router = express.Router();
-const { protect , adminOnly } = require('../middleware/protect');
+const router  = express.Router();
+const { protect } = require('../middleware/protect');
+const guardController = require('../controllers/guardController');
 
-router.get('/schedule', protect, (req, res) => {
-    res.render('schedule');
-});
+router.get('/schedule', protect, guardController.getSchedule);
 
-router.get('/timecard', protect, (req, res) => {
-    res.render('timecard');
-});
+router.get('/timecard',  protect, guardController.getTimecard);
+router.post('/clockin',  protect, guardController.clockIn);
+router.post('/clockout', protect, guardController.clockOut);
 
-router.get('/dayoff', protect, (req, res) => {
-    res.render('dayoff');
-});
+router.get('/dayoff',  protect, guardController.getDayOff);
+router.post('/dayoff', protect, guardController.submitDayOff);
 
-router.get('/profile', protect, (req, res) => {
-    res.render('profile');
-});
+router.get('/profile', protect, (req, res) => res.render('profile'));
 
 module.exports = router;

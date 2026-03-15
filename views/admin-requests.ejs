@@ -1,0 +1,44 @@
+<h2>Time Off Requests</h2>
+
+<table class="table">
+
+<tr>
+<th>Guard</th>
+<th>From</th>
+<th>To</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+<% requests.forEach(r=>{ %>
+
+<tr>
+<td><%= r.guard.name %></td>
+<td><%= r.fromDate.toDateString() %></td>
+<td><%= r.toDate.toDateString() %></td>
+<td><%= r.status %></td>
+
+<td>
+
+<form action="/admin/request/update" method="POST">
+
+<input type="hidden" name="id" value="<%= r._id %>">
+
+<select name="status">
+
+<option value="approved">Approve</option>
+<option value="rejected">Reject</option>
+
+</select>
+
+<button type="submit">Update</button>
+
+</form>
+
+</td>
+
+</tr>
+
+<% }) %>
+
+</table>

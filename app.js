@@ -9,12 +9,8 @@ const expressLayouts = require("express-ejs-layouts");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const guardRoutes = require("./routes/guardRoutes");
-const { protect, adminOnly } = require("./middleware/protect");
-
-const Timecard = require('./models/Timecard');
-const auth = require('./middleware/auth');
-
-
+const adminRoutes = require("./routes/adminRoutes");
+const { protect } = require("./middleware/protect");
 const app = express();
 
 // ==========================
@@ -29,8 +25,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+
 // ==========================
-// SESSION CONFIG
+// SESSION
 // ==========================
 app.use(
   session({
@@ -41,12 +38,12 @@ app.use(
       mongoUrl: process.env.MONGO_URI,
     }),
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
 
-// Make user available globally in EJS
+// Make user available in all EJS views
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
@@ -66,53 +63,26 @@ app.set("layout", "layout");
 
 // Home
 app.get("/", (req, res) => {
-  if (req.session.user) {
-    return res.redirect("/dashboard");
-  }
+  if (req.session.user) return res.redirect("/dashboard");
   res.render("index", { title: "Guard Portal" });
 });
 
-// Protected Dashboard
+// Dashboard
 app.get("/dashboard", protect, (req, res) => {
   res.render("dashboard", { title: "Dashboard" });
 });
 
-// Admin Panel (role protected)
-app.get("/admin", protect, adminOnly, (req, res) => {
-  res.render("admin", { title: "Admin Panel" });
-});
-
-// Auth Routes (signup/login/logout)
+// Auth (signup / login / logout)
 app.use(authRoutes);
 
-// Guard Routes (schedule, timecard, dayoff)
-app.use("/",guardRoutes);
+// Guard routes (schedule, timecard, dayoff)
+app.use("/", guardRoutes);
 
-
-app.post('/clockin', auth, async (req, res) => {
-    await Timecard.create({
-        user: req.session.userId,
-        clockIn: new Date()
-    });
-    res.redirect('/timecard');
-});
-
-app.post('/clockout', auth, async (req, res) => {
-    const latest = await Timecard.findOne({
-        user: req.session.userId,
-        clockOut: null
-    }).sort({ createdAt: -1 });
-
-    if (latest) {
-        latest.clockOut = new Date();
-        await latest.save();
-    }
-
-    res.redirect('/timecard');
-});
+// Admin routes
+app.use("/", adminRoutes);
 
 // ==========================
-// 404 HANDLER
+// 404
 // ==========================
 app.use((req, res) => {
   res.status(404).render("404", { title: "Page Not Found" });
@@ -122,8 +92,6 @@ app.use((req, res) => {
 // SERVER
 // ==========================
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, () => {
-  console.log("Mongo URI:", process.env.MONGO_URI);
-  console.log("Server running on port", PORT);
+  console.log(`Server running on port ${PORT}`);
 });

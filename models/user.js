@@ -1,26 +1,29 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt   = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Name is required"],
       trim: true,
+      minlength: [2, "Name must be at least 2 characters"],
+      maxlength: [50, "Name cannot exceed 50 characters"],
     },
 
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
       lowercase: true,
       trim: true,
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address"],
     },
 
     password: {
       type: String,
-      required: true,
-      minlength: 6,
+      required: [true, "Password is required"],
+      minlength: [4, "Password must be at least 4 characters"],  // plain text check before hashing
     },
 
     role: {
@@ -35,11 +38,17 @@ const userSchema = new mongoose.Schema(
 // ==============================
 // HASH PASSWORD BEFORE SAVE
 // ==============================
-userSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
+userSchema.pre("save", async function (next) {   // always pass next
+  if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  // Re-validate length before hashing — bcrypt silently truncates > 72 chars
+  if (this.password.length < 4) {
+    return next(new Error("Password must be at least 4 characters"));
+  }
+
+  const salt     = await bcrypt.genSalt(10);
+  this.password  = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // ==============================
