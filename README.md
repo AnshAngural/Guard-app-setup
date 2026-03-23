@@ -8,7 +8,9 @@ A full-stack security guard management web application with role-based access co
 
 ## 📸 Screenshots
 
-> _Add screenshots of your admin dashboard, user panel, and login page here_
+> <img width="1920" height="1022" alt="Screenshot (4)" src="https://github.com/user-attachments/assets/bbee9dc4-9caa-4edb-8116-3f906a937fd2" />
+<img width="1920" height="1032" alt="Screenshot (5)" src="https://github.com/user-attachments/assets/cd7aa81b-19a0-4c6f-9f11-a8339e482120" />
+<img width="1920" height="1029" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/16a05e1a-ce7f-4743-98e9-25a19796252c" />
 
 ---
 
